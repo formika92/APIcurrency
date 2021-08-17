@@ -17,9 +17,6 @@ class ParcerCbr:
     errors_list = []
 
     def _get_page(self):
-        """
-
-        """
         response = requests.get(self.url)
         if (response.status_code == 200
                 and '404' not in response.url):
@@ -28,27 +25,21 @@ class ParcerCbr:
             self.errors_list.append(f'Error {requests.get(self.url).status_code}')
 
     def _get_soup(self):
-        """
-
-        """
         page = self._get_page()
         return page if page is None else BeautifulSoup(page.text, 'lxml')
 
 
 class ParcerAvailableCurrency(ParcerCbr):
-    """
-    """
 
-    def _get_page(self, date, code):
+    def _get_page(self):
         return super()._get_page()
 
     def _get_soup(self):
         return super()._get_soup()
 
-    def _find_currency_list(self, code):
+    def _find_currency_list(self):
         """
-
-        :return:
+        Находит наименования и коды доступных валют
         """
         soup = self._get_soup()
         result_list = []
@@ -84,5 +75,3 @@ class ParcerValueCurrency(ParcerCbr):
                 text = child.value.text
                 if text:
                     return Decimal(text.replace(',', '.'))
-
-

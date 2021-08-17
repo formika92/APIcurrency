@@ -15,58 +15,46 @@ from currency.parcers import (
 
 
 class CurrencyListViewSet(APIView):
-    def get(self, request):
-        """
 
-        :param request:
-        :return:
-        """
-        parser = ParcerAvailableCurrency()
-        return Response({'currency_list': f'{parser._find_currency_list()}'})
+    def get(self, request):
+        return Response(
+            {
+                'currency_list': f'{ParcerAvailableCurrency()._find_currency_list()}'
+            }
+        )
 
 
 class CurrencyValueViewSet(APIView):
-    def get(self, request):
-        """
 
-        :param request:
-        :return:
-        """
-        date_first, errors_list = parse_datetime(
-            date=self.request.query_params.get('date1', None),
+    def get(self, request):
+        date_first, errors_first = parse_datetime(
+            date=self.request.query_params.get('date1'),
         )
-        date_second, errors_list = parse_datetime(
-            date=self.request.query_params.get('date2', None),
+        date_second, errors_second = parse_datetime(
+            date=self.request.query_params.get('date2'),
         )
 
         if date_first and date_second:
-            code = self.request.query_params.get('code', None)
-
-            result = self.calc_diff_numbers(
-                date_first=date_first,
-                date_second=date_second,
-                code=code,
-            )
+            code = self.request.query_params.get('code')
 
             result = Response(
-                {
-                    'difference': f'{result}'
-                }
+                self.calc_diff_numbers(
+                    date_first=date_first,
+                    date_second=date_second,
+                    code=code,
+                )
             )
         else:
-            result = Response({'Error': f'{errors_list}'})
+            result = Response({'Error': f'{errors_first + errors_second}'})
 
         return result
 
     @staticmethod
     def calc_diff_numbers(date_first, date_second, code):
         """
-
-        :param date_first:
-        :param date_second:
-        :param code:
-        :return:
+        Возвращает курсы валют на указанные даты и разницу курсов.
         """
+
         num_first = ParcerValueCurrency(
             date=date_first,
         )._find_value_currency(
@@ -78,5 +66,14 @@ class CurrencyValueViewSet(APIView):
             code=code,
         )
 
-        return num_first - num_second
+        result = {
+            date_first: num_first,
+            date_second: num_second,
+        }
 
+        if num_first and num_second:
+            result['difference'] = num_first - num_second
+        else:
+            result['Error'] = 'Не найдено значение валюты на указанную дату'
+
+        return result
