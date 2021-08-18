@@ -13,7 +13,7 @@ def parse_datetime(date):
     try:
         date_object = datetime.strptime(date, '%Y-%m-%d')
         date_object = datetime.strftime(date_object, '%d/%m/%Y')
-    except ValueError:
+    except (ValueError, TypeError):
         errors_list.append(f'Неверный формат даты {date}.')
 
     return date_object, errors_list
