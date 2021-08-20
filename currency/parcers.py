@@ -37,7 +37,7 @@ class ParcerAvailableCurrency(ParcerCbr):
     def _get_soup(self):
         return super()._get_soup()
 
-    def _find_currency_list(self):
+    def find_currency_list(self):
         """
         Находит наименования и коды доступных валют
         """
@@ -47,7 +47,8 @@ class ParcerAvailableCurrency(ParcerCbr):
             result_list = iter(
               re.sub(r'[\[\]]*|\<[^>]*\>', '', str(soup.find_all(['iso_char_code', 'name']))).split(',')
             )
-            result_list = [curr + next(result_list, '') for curr in result_list]
+            # result_list = [curr + next(result_list, '') for curr in result_list]
+            result_list = [curr for curr in result_list]
         else:
             result_list.extend(self.errors_list)
 
@@ -67,7 +68,7 @@ class ParcerValueCurrency(ParcerCbr):
     def _get_soup(self):
         return super()._get_soup()
 
-    def _find_value_currency(self, code):
+    def find_value_currency(self, code):
         soup = self._get_soup()
 
         for child in soup.valcurs.children:

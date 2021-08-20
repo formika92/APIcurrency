@@ -9,19 +9,8 @@ from currency.helpers import (
     parse_datetime,
 )
 from currency.parcers import (
-    ParcerAvailableCurrency,
     ParcerValueCurrency,
 )
-
-
-class CurrencyListViewSet(APIView):
-
-    def get(self, request):
-        return Response(
-            {
-                'currency_list': f'{ParcerAvailableCurrency()._find_currency_list()}'
-            }
-        )
 
 
 class CurrencyValueViewSet(APIView):
@@ -57,12 +46,12 @@ class CurrencyValueViewSet(APIView):
 
         num_first = ParcerValueCurrency(
             date=date_first,
-        )._find_value_currency(
+        ).find_value_currency(
             code=code,
         )
         num_second = ParcerValueCurrency(
             date=date_second,
-        )._find_value_currency(
+        ).find_value_currency(
             code=code,
         )
 
