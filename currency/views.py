@@ -1,3 +1,7 @@
+from datetime import (
+    datetime,
+)
+
 from rest_framework.response import (
     Response,
 )
@@ -5,9 +9,6 @@ from rest_framework.views import (
     APIView,
 )
 
-from currency.helpers import (
-    parse_datetime,
-)
 from currency.parcers import (
     ParcerValueCurrency,
 )
@@ -16,27 +17,28 @@ from currency.parcers import (
 class CurrencyValueViewSet(APIView):
 
     def get(self, request):
-        date_first, errors_first = parse_datetime(
-            date=self.request.query_params.get('date1'),
-        )
-        date_second, errors_second = parse_datetime(
-            date=self.request.query_params.get('date2'),
-        )
+        date_first = self.request.query_params.get('date1')
+        date_second = self.request.query_params.get('date2')
+        code = self.request.query_params.get('code')
 
-        if date_first and date_second:
-            code = self.request.query_params.get('code')
+        try:
+            date_first = datetime.strptime(date_first, '%Y-%m-%d')
+            date_first = datetime.strftime(date_first, '%d/%m/%Y')
 
-            result = Response(
-                self.calc_diff_numbers(
-                    date_first=date_first,
-                    date_second=date_second,
-                    code=code,
-                )
+            date_second = datetime.strptime(date_second, '%Y-%m-%d')
+            date_second = datetime.strftime(date_second, '%d/%m/%Y')
+
+        except (ValueError, TypeError):
+            return Response({'Error': f'Неверный формат даты'})
+
+
+        return Response(
+            self.calc_diff_numbers(
+                date_first=date_first,
+                date_second=date_second,
+                code=code,
             )
-        else:
-            result = Response({'Error': f'{errors_first + errors_second}'})
-
-        return result
+        )
 
     @staticmethod
     def calc_diff_numbers(date_first, date_second, code):

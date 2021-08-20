@@ -1,6 +1,9 @@
 from django.core.management.base import (
     BaseCommand,
 )
+from django.db import (
+    transaction,
+)
 
 from currency.models import (
     CurrencyList,
@@ -13,6 +16,7 @@ from currency.parcers import (
 class Command(BaseCommand):
     help = 'Add currency list'
 
+    @transaction.atomic(savepoint=False)
     def handle(self, *args, **kwargs):
         CurrencyList.objects.all().delete()
         currency_list = ParcerAvailableCurrency().find_currency_list()
@@ -24,7 +28,7 @@ class Command(BaseCommand):
                 currency.name = currency_list[index-1]
                 currency.code = currency_list[index]
                 currency.save()
-                index +=2
+                index += 2
             except IndexError:
                 break
 
