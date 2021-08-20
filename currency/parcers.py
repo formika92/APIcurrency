@@ -44,11 +44,14 @@ class ParcerAvailableCurrency(ParcerCbr):
         soup = self._get_soup()
         result_list = []
         if soup:
-            result_list = iter(
-              re.sub(r'[\[\]]*|\<[^>]*\>', '', str(soup.find_all(['iso_char_code', 'name']))).split(',')
-            )
+            # result_list = iter(
+            #   re.sub(r'[\[\]]*|\<[^>]*\>', '', str(soup.find_all(['iso_char_code', 'name']))).split(',')
+            # )
             # result_list = [curr + next(result_list, '') for curr in result_list]
-            result_list = [curr for curr in result_list]
+
+            result_list = re.sub(
+                r'\s*(?=[<])|[\[\]]*|\<[^>]*\>', '', str(soup.find_all(['iso_char_code', 'name']))
+            ).split(',')
         else:
             result_list.extend(self.errors_list)
 

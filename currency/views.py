@@ -9,6 +9,9 @@ from rest_framework.views import (
     APIView,
 )
 
+from currency.models import (
+    CurrencyList,
+)
 from currency.parcers import (
     ParcerValueCurrency,
 )
@@ -46,25 +49,36 @@ class CurrencyValueViewSet(APIView):
         Возвращает курсы валют на указанные даты и разницу курсов.
         """
 
-        num_first = ParcerValueCurrency(
-            date=date_first,
-        ).find_value_currency(
-            code=code,
-        )
-        num_second = ParcerValueCurrency(
-            date=date_second,
-        ).find_value_currency(
-            code=code,
+        currency = CurrencyList.objects.filter(
+            code=code
         )
 
-        result = {
-            date_first: num_first,
-            date_second: num_second,
-        }
+        result = {}
 
-        if num_first and num_second:
-            result['difference'] = num_first - num_second
+        if currency:
+
+            num_first = ParcerValueCurrency(
+                date=date_first,
+            ).find_value_currency(
+                code=code,
+            )
+            num_second = ParcerValueCurrency(
+                date=date_second,
+            ).find_value_currency(
+                code=code,
+            )
+
+            result = {
+                date_first: num_first,
+                date_second: num_second,
+            }
+
+            if num_first and num_second:
+                result['difference'] = num_first - num_second
+            else:
+                result['Error'] = 'Не найдено значение валюты на указанную дату'
+
         else:
-            result['Error'] = 'Не найдено значение валюты на указанную дату'
+            result['Error'] = 'Неверный код валюты.'
 
         return result

@@ -21,15 +21,10 @@ class Command(BaseCommand):
         CurrencyList.objects.all().delete()
         currency_list = ParcerAvailableCurrency().find_currency_list()
 
-        index = 1
-        for _ in currency_list:
+        for index in range(0, len(currency_list), 2):
             currency = CurrencyList()
-            try:
-                currency.name = currency_list[index-1]
-                currency.code = currency_list[index]
-                currency.save()
-                index += 2
-            except IndexError:
-                break
+            currency.name = currency_list[index]
+            currency.code = currency_list[index+1]
+            currency.save()
 
         self.stdout.write(f'Successfully loaded {currency_list}')
